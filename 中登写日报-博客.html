@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中登写日报 · 把热爱做成内容，把内容做成生意</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F7F6F3'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%23192930'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ================= 设计令牌（极简白墨 · 参考 zarazhang.com） ================= */
+:root{
+  --bg:#FFFFFF;
+  --bg-2:#F7F6F3;
+  --bg-3:#FCFBF9;
+  --panel:#FFFFFF;
+  --panel-2:#FBFAF7;
+  --line:rgba(25,41,48,.10);
+  --line-strong:rgba(25,41,48,.22);
+  --ink:#192930;
+  --muted:#5C6670;
+  --faint:#8B9399;
+  --accent:#155A93;
+  --accent-soft:rgba(21,90,147,.08);
+  --ok:#1E8E5A;
+  --danger:#B3402F;
+  --font-serif:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --font-sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  --radius:12px;
+  --shadow:0 16px 40px rgba(25,41,48,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit;color:inherit}
+::selection{background:var(--accent-soft)}
+h1,h2,h3,h4{font-family:var(--font-serif)}
+
+/* ================= 基础布局 ================= */
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+.narrow{max-width:820px}
+.narrow-admin{max-width:980px}
+.view{display:none}
+.view.active{display:block}
+.page-top{padding:104px 0 36px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-3),var(--bg))}
+.page-crumb{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--faint);margin-bottom:16px;flex-wrap:wrap}
+.page-crumb a{color:var(--muted);transition:color .2s}
+.page-crumb a:hover{color:var(--accent)}
+.page-title{font-size:clamp(26px,3.6vw,36px);font-weight:900;line-height:1.25;color:var(--ink)}
+.page-desc{margin-top:10px;color:var(--muted);font-size:15.5px;max-width:640px}
+
+/* ================= 顶部导航 ================= */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{font-family:var(--font-serif);font-size:19px;font-weight:700;letter-spacing:.01em;color:var(--ink);transition:color .2s}
+.brand:hover{color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:24px;font-size:14.5px;color:var(--muted)}
+.nav-links a{transition:color .2s;padding:4px 0}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a.on{color:var(--accent);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:14px}
+.nav-admin{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--faint);border:1px solid var(--line-strong);border-radius:999px;padding:6px 14px;transition:border-color .2s,color .2s}
+.nav-admin:hover{color:var(--accent);border-color:var(--accent)}
+.nav-admin svg{width:14px;height:14px;stroke:currentColor}
+.nav-burger{display:none;width:44px;height:44px;border:1px solid var(--line-strong);border-radius:10px;align-items:center;justify-content:center}
+.nav-burger svg{width:20px;height:20px;stroke:var(--ink)}
+.nav-mobile{display:none;flex-direction:column;padding:8px 24px 16px;gap:2px;border-top:1px solid var(--line);background:rgba(255,255,255,.98)}
+.nav-mobile a{padding:12px 4px;font-size:15px;color:var(--muted);border-bottom:1px solid var(--line)}
+.nav-mobile a:last-child{border-bottom:none}
+.nav-mobile a.on{color:var(--accent)}
+.nav-mobile.open{display:flex}
+
+/* ================= 按钮 ================= */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:10px;font-size:14.5px;font-weight:700;transition:transform .18s,box-shadow .18s,background .18s,border-color .18s;cursor:pointer;white-space:nowrap}
+.btn svg{width:16px;height:16px;stroke:currentColor}
+.btn-primary{background:var(--ink);color:#fff;box-shadow:0 8px 20px rgba(25,41,48,.16)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(25,41,48,.22);background:#0E1519}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--ink);background:var(--bg)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.btn-danger{border:1px solid rgba(179,64,47,.45);color:var(--danger);background:rgba(179,64,47,.05)}
+.btn-danger:hover{background:rgba(179,64,47,.12)}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:8px}
+
+/* ================= 首页页头 ================= */
+.blog-hero{padding:128px 0 52px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-3),var(--bg))}
+.blog-hero .grid-bg{display:none}
+.blog-hero h1{font-size:clamp(30px,4.4vw,44px);font-weight:900;line-height:1.22;color:var(--ink)}
+.blog-hero p{margin:14px 0 0;color:var(--muted);font-size:16px;max-width:560px}
+.cat-chips{display:flex;justify-content:flex-start;gap:8px 20px;flex-wrap:wrap;margin-top:24px}
+.cchip{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);padding:8px 0;transition:color .2s}
+.cchip:hover{color:var(--accent)}
+.cchip i{width:8px;height:8px;border-radius:50%;flex:none}
+
+/* ================= 文章列表 ================= */
+.list-wrap{padding-block:44px 76px}
+.list-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.list-head h2{font-size:20px;font-weight:800;color:var(--ink)}
+.list-head .cnt{font-size:13.5px;color:var(--faint)}
+.post-list{display:flex;flex-direction:column;gap:0}
+.post{display:flex;gap:24px;align-items:flex-start;padding:28px 4px;border-bottom:1px solid var(--line);transition:background .2s;border-radius:4px}
+.post:hover{background:var(--bg-3)}
+.post:first-child{border-top:1px solid var(--line)}
+.post-cover{width:224px;height:126px;border-radius:10px;object-fit:cover;border:1px solid var(--line);flex:none;background:var(--bg-2)}
+.post-main{flex:1;min-width:0}
+.post-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--faint)}
+.post-meta .date{font-family:var(--font-serif);font-size:13.5px;color:var(--muted)}
+.post-meta .author{color:var(--faint)}
+.post h3{font-size:21px;font-weight:800;line-height:1.45;margin:10px 0 8px;color:var(--ink);transition:color .2s}
+.post:hover h3{color:var(--accent)}
+.post p{font-size:14.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:640px}
+.post .more{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13.5px;color:var(--accent);font-weight:600}
+.post .more svg{width:14px;height:14px;stroke:currentColor;transition:transform .2s}
+.post:hover .more svg{transform:translateX(3px)}
+.cat-tag{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--bg-2);font-weight:600}
+.c-empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:14.5px;border:1px dashed var(--line-strong);border-radius:12px;display:none}
+
+/* ================= 文章详情 ================= */
+.article-wrap{padding-block:32px 60px}
+.article-head h1{font-size:clamp(26px,3.6vw,36px);font-weight:900;line-height:1.4;margin:14px 0 16px;color:var(--ink)}
+.art-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--faint);padding-bottom:22px;border-bottom:1px solid var(--line)}
+.art-meta .author{color:var(--muted)}
+.article-cover{margin:24px 0 6px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--bg-2)}
+.article-cover img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.article-body{padding:30px 0 26px;font-family:var(--font-serif);font-size:16.5px;color:#26313B;line-height:2}
+.article-body p{margin:0 0 20px}
+.article-body h3{font-size:19px;font-weight:800;margin:32px 0 12px;color:var(--ink)}
+.article-body blockquote{margin:22px 0;padding:16px 22px;border-left:3px solid var(--ink);border-radius:8px;background:var(--bg-2);color:var(--muted);font-size:15.5px}
+.article-body .art-figure{margin:24px 0;text-align:center}
+.article-body .art-figure img{max-width:100%;border-radius:12px;border:1px solid var(--line);background:var(--bg-2)}
+.article-body .art-figure figcaption{margin-top:8px;font-size:13px;color:var(--faint)}
+.article-body hr{border:none;border-top:1px solid var(--line);margin:26px 0}
+.article-body code{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:14px;font-family:"Space Grotesk",monospace;color:var(--accent)}
+.article-foot{display:flex;gap:12px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px}
+.article-foot button{flex:1;display:flex;flex-direction:column;gap:3px;padding:14px 18px;border:1px solid var(--line);border-radius:10px;background:var(--bg);text-align:left;transition:border-color .2s,background .2s}
+.article-foot button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.article-foot .l{font-size:12px;color:var(--faint);display:flex;align-items:center;gap:6px}
+.article-foot .l svg{width:13px;height:13px;stroke:currentColor}
+.article-foot .t{font-size:13.5px;color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.article-foot button.next{text-align:right;align-items:flex-end}
+
+/* ================= 关于 ================= */
+.about-wrap{padding-block:32px 64px}
+.about-head{display:flex;align-items:center;gap:22px;margin-bottom:34px;flex-wrap:wrap}
+.about-head h1{font-size:clamp(24px,3.4vw,32px);font-weight:900;color:var(--ink)}
+.about-head .sub{color:var(--muted);font-size:15px;margin-top:4px}
+.about-sec h2{font-size:17px;font-weight:800;margin:30px 0 14px;display:flex;align-items:center;gap:10px;color:var(--ink)}
+.about-sec h2::before{content:"";width:14px;height:3px;border-radius:2px;background:var(--ink)}
+.about-sec p{color:var(--muted);font-size:15px;margin-bottom:12px;max-width:640px}
+.about-sec p b{color:var(--ink)}
+.tl{display:grid;grid-template-columns:96px 1fr;gap:14px;margin-top:6px}
+.tl-item{display:contents}
+.tl-time{font-family:var(--font-serif);font-size:13px;color:var(--accent);padding:6px 0;text-align:right}
+.tl-line{position:relative;width:2px;background:var(--line-strong);justify-self:center}
+.tl-line::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.tl-body{padding:0 0 24px}
+.tl-body h4{font-size:15px;font-weight:700;color:var(--ink)}
+.tl-body p{font-size:13.5px;color:var(--muted);margin-top:3px}
+.contact-card{margin-top:28px;border:1px solid var(--line-strong);border-radius:14px;padding:26px;background:var(--bg-3)}
+.contact-card h3{font-size:17px;font-weight:800;margin-bottom:12px;color:var(--ink)}
+.contact-card p{color:var(--muted);font-size:14.5px;margin-bottom:8px}
+.contact-card .mail{font-family:var(--font-serif);color:var(--accent);font-weight:600;word-break:break-all}
+
+/* ================= 页脚 ================= */
+footer{border-top:1px solid var(--line);padding:38px 0 42px;background:var(--bg-2)}
+.foot-in{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.foot-brand{font-family:var(--font-serif);font-size:15.5px;font-weight:700;color:var(--ink)}
+.foot-note{font-size:12.5px;color:var(--faint)}
+.foot-links{display:flex;gap:18px;font-size:13px;color:var(--faint)}
+.foot-links a:hover{color:var(--accent)}
+
+/* ================= Toast ================= */
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,80px);z-index:300;background:rgba(25,41,48,.95);color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;box-shadow:0 16px 40px rgba(25,41,48,.2);opacity:0;pointer-events:none;transition:transform .3s,opacity .3s;max-width:88vw;text-align:center}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
+/* ================= 滚动显现 ================= */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+}
+
+/* ================= 响应式 ================= */
+@media (max-width:960px){
+  .nav-links{display:none}
+  .nav-burger{display:flex}
+  .tl{grid-template-columns:76px 1fr}
+}
+@media (max-width:640px){
+  .blog-hero{padding:112px 0 40px}
+  .cchip{font-size:14.5px}
+  .post{flex-direction:column;gap:14px}
+  .post-cover{width:100%;height:auto;aspect-ratio:16/9}
+  .post-meta{font-size:13.5px}
+  .cat-tag{font-size:12.5px}
+  .foot-links a{padding:10px 6px}
+  .article-foot{flex-direction:column}
+  .post h3{font-size:19px}
+  .foot-in{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 顶部导航 ================= -->
+<header class="nav" id="nav">
+  <div class="container nav-in">
+    <a class="brand" href="#/home">中登写日报</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#/home" data-nav="home">首页</a>
+      <a href="#/about" data-nav="about">关于</a>
+      <a href="#/category/zimeiti" data-nav="zimeiti">自媒体</a>
+      <a href="#/category/life" data-nav="life">生活</a>
+      <a href="#/category/guandian" data-nav="guandian">观点</a>
+      <a href="#/category/tech" data-nav="tech">科技</a>
+      <a href="#/category/other" data-nav="other">其他</a>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-admin" href="登录注册.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        登录 / 注册
+      </a>
+      <button class="nav-burger" id="navBurger" aria-label="打开菜单">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="#/home" data-nav="home">首页</a>
+    <a href="#/about" data-nav="about">关于</a>
+    <a href="#/category/zimeiti" data-nav="zimeiti">自媒体</a>
+    <a href="#/category/life" data-nav="life">生活</a>
+    <a href="#/category/guandian" data-nav="guandian">观点</a>
+    <a href="#/category/tech" data-nav="tech">科技</a>
+    <a href="#/category/other" data-nav="other">其他</a>
+    <a href="登录注册.html">登录 / 注册</a>
+  </div>
+</header>
+
+<!-- ================= 视图：首页 ================= -->
+<section id="view-home" class="view">
+  <div class="blog-hero">
+    <div class="grid-bg"></div>
+    <div class="container narrow inner">
+      <h1>中登写日报</h1>
+      <p>把热爱做成内容，把内容做成生意。这里记录我做号路上的实战复盘、观点与生活。</p>
+      <div class="cat-chips" id="heroChips"></div>
+    </div>
+  </div>
+  <div class="container narrow list-wrap">
+    <div class="list-head">
+      <h2>最新文章</h2>
+      <span class="cnt" id="homeCount"></span>
+    </div>
+    <div class="post-list" id="homePosts"></div>
+    <div class="c-empty" id="homeEmpty">还没有文章，去发布后台写一篇吧。</div>
+  </div>
+</section>
+
+<!-- ================= 视图：分类页 ================= -->
+<section id="view-category" class="view">
+  <div class="page-top">
+    <div class="container narrow">
+      <div class="page-crumb"><a href="#/home">首页</a><span class="sep">/</span><span class="cur" id="catName">分类</span></div>
+      <h1 class="page-title" id="catTitle">分类</h1>
+      <p class="page-desc" id="catDesc"></p>
+    </div>
+  </div>
+  <div class="container narrow list-wrap">
+    <div class="post-list" id="catPosts"></div>
+    <div class="c-empty" id="catEmpty">该分类下暂无文章。</div>
+  </div>
+</section>
+
+<!-- ================= 视图：文章详情 ================= -->
+<section id="view-article" class="view">
+  <div class="container narrow article-wrap">
+    <div class="page-crumb"><a href="#/home">首页</a><span class="sep">/</span><a id="artCatLink" href="#/category/zimeiti">分类</a><span class="sep">/</span><span class="cur" id="artCrumb">文章</span></div>
+    <div class="article-head">
+      <h1 id="artTitle">文章标题</h1>
+      <div class="art-meta" id="artMeta"></div>
+    </div>
+    <div class="article-body" id="artBody"></div>
+    <div class="article-foot">
+      <button id="prevBtn">
+        <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>上一篇</span>
+        <span class="t" id="prevTitle"></span>
+      </button>
+      <button class="next" id="nextBtn">
+        <span class="l">下一篇<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <span class="t" id="nextTitle"></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 视图：关于 ================= -->
+<section id="view-about" class="view">
+  <div class="page-top">
+    <div class="container narrow">
+      <div class="page-crumb"><a href="#/home">首页</a><span class="sep">/</span><span class="cur">关于</span></div>
+    </div>
+  </div>
+  <div class="container narrow about-wrap">
+    <div class="about-head">
+      <div>
+        <h1>你好，我是江博</h1>
+        <p class="sub">【从业年限】+ 年互联网从业者，现全职做自媒体，主理「中登写日报」</p>
+      </div>
+    </div>
+    <div class="about-sec">
+      <h2>关于我</h2>
+      <p>【一段个人经历介绍：做过什么、现在做什么。】这里不讲理论——起号、冷启动、变现、避坑，都是正在跑的事，跑通了就复盘一遍，做错了也照实说。</p>
+      <p>这个博客就是我的复盘本：把踩过的坑、跑通的路，原原本本写下来。每周更新，欢迎常来。</p>
+    </div>
+    <div class="about-sec">
+      <h2>从业经历</h2>
+      <div class="tl" id="aboutTimeline"></div>
+    </div>
+    <div class="about-sec">
+      <h2>联系方式</h2>
+      <div class="contact-card">
+        <h3>想合作、咨询，或聊聊内容？</h3>
+        <p>发邮件给我，通常在 <b style="color:var(--text)">24 小时内回复</b>。</p>
+        <p class="mail">【你的邮箱】</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 页脚 ================= -->
+<footer>
+  <div class="container foot-in">
+    <div class="foot-brand">中登写日报</div>
+    <div class="foot-links">
+      <a href="登录注册.html">登录 / 注册</a>
+      <a href="发布后台.html">发布后台</a>
+    </div>
+    <div class="foot-note">© 2026 中登写日报 · 示例内容，正式上线前请替换</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+'use strict';
+
+/* ================= 数据：分类 ================= */
+var CATEGORIES=[
+  {slug:'zimeiti',name:'自媒体',color:'#1757A8',desc:'做号复盘：起号、冷启动、内容策略与变现路径。'},
+  {slug:'life',name:'生活',color:'#1F7A6C',desc:'生活随笔：转型、日常与那些真实发生的事。'},
+  {slug:'guandian',name:'观点',color:'#5B6B9E',desc:'一些看法：学习方法、工作方式与长期主义。'},
+  {slug:'tech',name:'科技',color:'#0F6E8C',desc:'科技观察：AI、工具与一人公司的实践。'},
+  {slug:'other',name:'其他',color:'#6E747A',desc:'零碎记录：工具、习惯与保持输出。'}
+];
+function catBySlug(s){for(var i=0;i<CATEGORIES.length;i++){if(CATEGORIES[i].slug===s){return CATEGORIES[i];}}return CATEGORIES[CATEGORIES.length-1];}
+
+/* ================= 数据：Supabase（文章入库，与发布后台共享） ================= */
+/* ★ 上线前替换为你的真实值：Supabase Dashboard → Project Settings → API */
+var DB_URL='https://ywdcgqatcqyvlcjyezbn.supabase.co';
+var DB_ANON='sb_publishable_cO6EgTPzZcC_GL5QJfmCwQ_Ualgt0r3';
+var sb=null;
+var postsCache=null;
+function loadPosts(force){
+  if(!force&&postsCache){return Promise.resolve(postsCache);}
+  if(!sb){sb=supabase.createClient(DB_URL,DB_ANON);}
+  return sb.from('posts').select('*').order('date',{ascending:false}).then(function(res){
+    if(res.error){toast('数据加载失败：'+res.error.message);return postsCache||[];}
+    postsCache=res.data||[];
+    return postsCache;
+  });
+}
+function allPosts(){return postsCache||[];}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ================= 工具：Toast ================= */
+var toastEl=null;
+function toast(msg){
+  if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';document.body.appendChild(toastEl);}
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastEl._t);
+  toastEl._t=setTimeout(function(){toastEl.classList.remove('show');},2200);
+}
+
+/* ================= 正文解析 ================= */
+function parseContent(src){
+  var blocks=String(src||'').split(/\n\s*\n/),out=[];
+  blocks.forEach(function(b){
+    b=b.trim();if(!b){return;}
+    if(b.indexOf('## ')==0){out.push('<h3>'+esc(b.slice(3))+'</h3>');return;}
+    if(b.indexOf('> ')==0){out.push('<blockquote>'+esc(b.slice(2))+'</blockquote>');return;}
+    var im=String(b).match(/^!\[([^\]]*)\]\(([^)]*)\)$/);
+    if(im){
+      out.push('<figure class="art-figure"><img src="'+esc(im[2])+'" alt="'+esc(im[1])+'" loading="lazy" onerror="this.parentNode.style.display=\'none\'">'+(im[1]?'<figcaption>'+esc(im[1])+'</figcaption>':'')+'</figure>');
+      return;
+    }
+    out.push('<p>'+b.split('\n').map(function(l){return esc(l);}).join('<br>')+'</p>');
+  });
+  return out.join('');
+}
+
+/* ================= 渲染：通用 ================= */
+function catTagHTML(slug){
+  var c=catBySlug(slug);
+  return '<span class="cat-tag">'+c.name+'</span>';
+}
+function postHTML(p){
+  return '<a class="post" href="#/article/'+p.id+'">'
+    +(p.cover_url?'<img class="post-cover" src="'+esc(p.cover_url)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')
+    +'<div class="post-main">'
+    +'<div class="post-meta"><span class="date">'+p.date+'</span>'+catTagHTML(p.cat)+'<span class="author">'+esc(p.author||'江博')+'</span></div>'
+    +'<h3>'+esc(p.title)+'</h3>'
+    +'<p>'+esc(p.excerpt)+'</p>'
+    +'<span class="more">阅读全文<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>'
+    +'</div>'
+    +'</a>';
+}
+function renderPostList(el,posts,emptyEl){
+  el.innerHTML=posts.map(postHTML).join('');
+  if(emptyEl){emptyEl.style.display=posts.length?'none':'block';}
+}
+
+/* ================= 视图：首页 ================= */
+function renderHome(){
+  loadPosts().then(function(posts){
+    document.getElementById('homeCount').textContent='共 '+posts.length+' 篇 · 持续更新';
+    renderPostList(document.getElementById('homePosts'),posts,document.getElementById('homeEmpty'));
+  });
+}
+function renderHeroChips(){
+  var el=document.getElementById('heroChips');
+  el.innerHTML=CATEGORIES.map(function(c){
+    return '<a class="cchip" href="#/category/'+c.slug+'"><i style="background:'+c.color+'"></i>'+c.name+'</a>';
+  }).join('');
+}
+
+/* ================= 视图：分类页 ================= */
+function renderCategory(slug){
+  loadPosts().then(function(all){
+    var c=catBySlug(slug);
+    var posts=all.filter(function(p){return p.cat===slug;});
+    document.getElementById('catName').textContent=c.name;
+    document.getElementById('catTitle').textContent=c.name;
+    document.getElementById('catDesc').textContent=c.desc+'（共 '+posts.length+' 篇）';
+    renderPostList(document.getElementById('catPosts'),posts,document.getElementById('catEmpty'));
+  });
+}
+
+/* ================= 视图：文章详情 ================= */
+function renderArticle(id){
+  loadPosts().then(function(posts){
+    var idx=-1;
+    for(var i=0;i<posts.length;i++){if(posts[i].id===id){idx=i;break;}}
+    if(idx<0){location.hash='#/home';return;}
+    var p=posts[idx];
+    var prev=posts[(idx+1)%posts.length],next=posts[(idx-1+posts.length)%posts.length];
+    document.getElementById('artCatLink').textContent=catBySlug(p.cat).name;
+    document.getElementById('artCatLink').setAttribute('href','#/category/'+p.cat);
+    document.getElementById('artCrumb').textContent=p.title.length>18?p.title.slice(0,18)+'…':p.title;
+    document.getElementById('artTitle').textContent=p.title;
+    document.getElementById('artMeta').innerHTML='<span class="date num">'+p.date+'</span>'+catTagHTML(p.cat)+'<span class="author">'+esc(p.author||'江博')+'</span>';
+    var coverHtml=p.cover_url?'<div class="article-cover"><img src="'+esc(p.cover_url)+'" alt=""></div>':'';
+    document.getElementById('artBody').innerHTML=coverHtml+parseContent(p.content);
+    document.getElementById('prevTitle').textContent=prev.title;
+    document.getElementById('nextTitle').textContent=next.title;
+    document.getElementById('prevBtn').onclick=function(){location.hash='#/article/'+prev.id;};
+    document.getElementById('nextBtn').onclick=function(){location.hash='#/article/'+next.id;};
+  });
+}
+
+/* ================= 视图：关于 ================= */
+function renderAbout(){
+  var tl=[
+    {time:'2016 - 2022',t:'一线研发 / 产品',d:'6 年一线代码，5 年互联网产品，做过大型跨境支付系统。'},
+    {time:'2023 - 2025',t:'业余做号，验证路径',d:'周末固定输出，跑通起号、冷启动与内容变现的完整路径。'},
+    {time:'2026 至今',t:'全职自媒体 · 中登写日报',d:'把热爱做成内容，把内容做成生意，持续复盘，持续输出。'}
+  ];
+  document.getElementById('aboutTimeline').innerHTML=tl.map(function(x){
+    return '<div class="tl-item"><span class="tl-time">'+x.time+'</span><span class="tl-line"></span><div class="tl-body"><h4>'+x.t+'</h4><p>'+x.d+'</p></div></div>';
+  }).join('');
+}
+
+/* ================= 路由 ================= */
+var viewMap={home:'view-home',category:'view-category',article:'view-article',about:'view-about'};
+function parseRoute(){
+  var h=location.hash||'';
+  if(h.indexOf('#/home')===0){return {v:'home'};}
+  if(h.indexOf('#/about')===0){return {v:'about'};}
+  var m=h.match(/^#\/category\/(\w+)/);
+  if(m){return {v:'category',slug:m[1]};}
+  m=h.match(/^#\/article\/([\w-]+)/);
+  if(m){return {v:'article',id:m[1]};}
+  return {v:'home'};
+}
+function onRoute(){
+  var r=parseRoute();
+  for(var k in viewMap){document.getElementById(viewMap[k]).classList.remove('active');}
+  document.getElementById(viewMap[r.v]).classList.add('active');
+  var key=r.v==='category'?r.slug:(r.v==='article'?'home':r.v);
+  var links=document.querySelectorAll('[data-nav]');
+  Array.prototype.forEach.call(links,function(a){
+    var on=a.getAttribute('data-nav')===key;
+    a.classList.toggle('on',on);
+  });
+  if(r.v==='home'){renderHome();renderHeroChips();}
+  else if(r.v==='category'){renderCategory(r.slug);}
+  else if(r.v==='article'){renderArticle(r.id);}
+  else if(r.v==='about'){renderAbout();}
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',onRoute);
+
+/* ================= 事件绑定 ================= */
+document.getElementById('navBurger').addEventListener('click',function(){
+  document.getElementById('navMobile').classList.toggle('open');
+});
+Array.prototype.forEach.call(document.querySelectorAll('#navMobile a'),function(a){
+  a.addEventListener('click',function(){document.getElementById('navMobile').classList.remove('open');});
+});
+
+/* ================= 启动 ================= */
+renderHeroChips();
+onRoute();
+})();
+</script>
+</body>
+</html>

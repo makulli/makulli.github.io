@@ -135,6 +135,18 @@ h1,h2,h3,h4{font-family:var(--font-serif)}
 .article-body .art-figure figcaption{margin-top:8px;font-size:13px;color:var(--faint)}
 .article-body hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 .article-body code{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:14px;font-family:"Space Grotesk",monospace;color:var(--accent)}
+.article-body img{max-width:100%;height:auto;border-radius:10px;display:block;margin:22px auto}
+.article-body h1,.article-body h2,.article-body h4,.article-body h5,.article-body h6{font-weight:800;margin:30px 0 12px;color:var(--ink);line-height:1.5}
+.article-body h1{font-size:24px}
+.article-body h2{font-size:22px}
+.article-body h4{font-size:17px}
+.article-body h5,.article-body h6{font-size:16px}
+.article-body ul,.article-body ol{margin:0 0 20px;padding-left:26px}
+.article-body li{margin:6px 0}
+.article-body a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.article-body table{width:100%;max-width:100%;border-collapse:collapse;margin:22px 0;font-size:14.5px;table-layout:fixed}
+.article-body th,.article-body td{border:1px solid var(--line);padding:9px 12px;text-align:left;word-break:break-word}
+.article-body th{background:var(--bg-2);font-weight:700}
 .article-foot{display:flex;gap:12px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px}
 .article-foot button{flex:1;display:flex;flex-direction:column;gap:3px;padding:14px 18px;border:1px solid var(--line);border-radius:10px;background:var(--bg);text-align:left;transition:border-color .2s,background .2s}
 .article-foot button:hover{border-color:var(--accent);background:var(--accent-soft)}
@@ -390,8 +402,28 @@ function toast(msg){
 }
 
 /* ================= 正文解析 ================= */
+function sanitizeHTML(html){
+  var doc;
+  try{doc=new DOMParser().parseFromString(html,'text/html');}catch(e){return '';}
+  if(!doc||!doc.body){return '';}
+  var BAD=['script','style','noscript','iframe','object','embed','link','meta','form','input','button','select','textarea','video','audio','source','canvas','svg','math','template'];
+  Array.prototype.forEach.call(doc.body.querySelectorAll('*'),function(n){
+    var tag=n.tagName?n.tagName.toLowerCase():'';
+    if(BAD.indexOf(tag)>=0){n.parentNode.removeChild(n);return;}
+    Array.prototype.forEach.call(n.attributes,function(a){
+      var name=a.name.toLowerCase();
+      var val=(a.value||'').trim().toLowerCase();
+      if(name.indexOf('on')===0){n.removeAttribute(a.name);}
+      else if((name==='href'||name==='src'||name==='xlink:href')&&/^\s*javascript:/i.test(val)){n.removeAttribute(a.name);}
+      else if(name==='style'&&/expression\s*\(|@import|behavior\s*:/i.test(val)){n.removeAttribute(a.name);}
+    });
+  });
+  return doc.body.innerHTML;
+}
 function parseContent(src){
-  var blocks=String(src||'').split(/\n\s*\n/),out=[];
+  var s=String(src||'').trim();
+  if(s.charAt(0)==='<'){return sanitizeHTML(s);}
+  var blocks=s.split(/\n\s*\n/),out=[];
   blocks.forEach(function(b){
     b=b.trim();if(!b){return;}
     if(b.indexOf('## ')==0){out.push('<h3>'+esc(b.slice(3))+'</h3>');return;}

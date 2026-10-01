@@ -243,7 +243,7 @@ h1,h2,h3{font-family:var(--font-serif)}
     </div>
     <div class="field">
       <label for="fContent">正文</label>
-      <textarea id="fContent" style="min-height:260px" placeholder="正文内容，空行分段；「## 」开头为小标题；「![描述](图片地址)」为配图，可保留原网页图片"></textarea>
+      <textarea id="fContent" style="min-height:260px" placeholder="正文内容：可直接写文字（空行分段，「## 」为小标题，「![描述](图片地址)」为配图）；导入 HTML 后此处为原排版代码（字体/样式/配图已保留），可手动微调"></textarea>
       <span class="hint">空行分段，「## 」开头作为小标题，「&gt; 」开头作为引用块</span>
     </div>
     <div class="admin-actions">
@@ -453,6 +453,25 @@ function deletePost(id){
 }
 
 /* ================= 一键导入 HTML ================= */
+/* ================= HTML 净化：移除脚本/事件属性等，保留排版/字体/配图 ================= */
+function sanitizeImportedHTML(html){
+  var doc;
+  try{doc=new DOMParser().parseFromString(html,'text/html');}catch(e){return '';}
+  if(!doc||!doc.body){return '';}
+  var BAD=['script','style','noscript','iframe','object','embed','link','meta','form','input','button','select','textarea','video','audio','source','canvas','svg','math','template'];
+  Array.prototype.forEach.call(doc.body.querySelectorAll('*'),function(n){
+    var tag=n.tagName?n.tagName.toLowerCase():'';
+    if(BAD.indexOf(tag)>=0){n.parentNode.removeChild(n);return;}
+    Array.prototype.forEach.call(n.attributes,function(a){
+      var name=a.name.toLowerCase();
+      var val=(a.value||'').trim().toLowerCase();
+      if(name.indexOf('on')===0){n.removeAttribute(a.name);}
+      else if((name==='href'||name==='src'||name==='xlink:href')&&/^\s*javascript:/i.test(val)){n.removeAttribute(a.name);}
+      else if(name==='style'&&/expression\s*\(|@import|behavior\s*:/i.test(val)){n.removeAttribute(a.name);}
+    });
+  });
+  return doc.body.innerHTML;
+}
 function importHTML(html, autoPublish){
   var doc;
   try{doc=new DOMParser().parseFromString(html,'text/html');}catch(e){toast('HTML 解析失败');return;}
@@ -468,42 +487,19 @@ function importHTML(html, autoPublish){
     var c=firstSrc.trim();
     if(c.indexOf('data:')===0||/^https?:\/\//i.test(c)||c.indexOf('//')===0){cover=c;}
   }
-  var lines=[];
-  /* 图片 → markdown 语法；相对路径给提示 */
-  function imgLine(n){
-    var s=(n.getAttribute('src')||n.getAttribute('data-src')||'').trim();
-    var alt=(n.getAttribute('alt')||'配图').trim().replace(/\s+/g,' ');
-    if(!s||s===firstSrc){return '';}
-    if(s.indexOf('data:')===0||/^https?:\/\//i.test(s)||s.indexOf('//')===0){
-      return '!['+alt+']('+s+')';
-    }
-    return '> \u26a0\ufe0f 配图「'+alt+'」为相对路径（'+s.slice(0,50)+'），请手动上传该图片';
-  }
-  function walk(el){
-    Array.prototype.forEach.call(el.children,function(n){
-      var tag=n.tagName?n.tagName.toLowerCase():'';
-      if(tag==='script'||tag==='style'||tag==='noscript'||tag==='svg'){return;}
-      if(tag==='img'){
-        var il=imgLine(n);
-        if(il){lines.push(il);}
-        return;
-      }
-      var txt=n.textContent.replace(/\s+/g,' ').trim();
-      if(!txt){walk(n);return;}
-      if(tag==='h2'||tag==='h3'||tag==='h4'){lines.push('## '+txt);}
-      else if(tag==='blockquote'){lines.push('> '+txt);}
-      else if(tag==='li'){lines.push('- '+txt);walk(n);}
-      else if(tag==='p'||tag==='div'||tag==='section'||tag==='article'||tag==='figcaption'){lines.push(txt);}
-      else{walk(n);}
-    });
-  }
-  walk(doc.body);
-  var content=lines.join('\n\n').replace(/\n{3,}/g,'\n\n').trim();
+  /* 保留原始 HTML：排版、内联字体样式、配图原样带入（已净化） */
+  var content=sanitizeImportedHTML(html);
   if(!content){toast('未能识别正文内容');return;}
-  var excerpt=content
-    .replace(/^##\s+/gm,'').replace(/^>\s+/gm,'').replace(/^-\s+/gm,'')
-    .replace(/^!\[[^\]]*\]\([^)]*\)\s*$/gm,'')
-    .replace(/[#>*_`]/g,'').replace(/\s+/g,' ').slice(0,80);
+  /* 摘要：取纯文本 */
+  var tmp=document.createElement('div');
+  tmp.innerHTML=content;
+  var excerpt=(tmp.textContent||'').replace(/\s+/g,' ').slice(0,80);
+  /* 相对路径图片提示 */
+  var rels=[];
+  Array.prototype.forEach.call(tmp.querySelectorAll('img'),function(im){
+    var s=(im.getAttribute('src')||'').trim();
+    if(s&&s.indexOf('data:')!==0&&!/^https?:\/\//i.test(s)&&s.indexOf('//')!==0&&s.indexOf('blob:')!==0){rels.push(s.slice(0,40));}
+  });
   document.getElementById('fTitle').value=title;
   setCover(cover);
   document.getElementById('fExcerpt').value=excerpt;
@@ -515,10 +511,10 @@ function importHTML(html, autoPublish){
       fd.value=d.getFullYear()+'-'+mm+'-'+dd;
     }
     saveEditor();
-    toast('已导入并发布：文章已保存，前台即时生效');
+    toast(rels.length?('已导入并发布：排版/字体/配图已保留；'+rels.length+' 张相对路径图片需替换为完整网址'):'已导入并发布：文章已保存，前台即时生效');
     return;
   }
-  toast('导入成功：原网页文本与配图已保留，可修改后保存发布');
+  toast(rels.length?('导入成功：原排版/字体/配图已保留；'+rels.length+' 张相对路径图片需替换为完整网址后再发布'):'导入成功：原排版、字体与配图已保留，可检查后保存发布');
 }
 function showImportTab(mode){
   importModal._tab=mode;

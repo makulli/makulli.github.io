@@ -55,8 +55,10 @@ h1,h2,h3,h4{font-family:var(--font-serif)}
 /* ================= 顶部导航 ================= */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav-in{height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand{font-family:var(--font-serif);font-size:19px;font-weight:700;letter-spacing:.01em;color:var(--ink);transition:color .2s}
+.brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-serif);font-size:19px;font-weight:700;letter-spacing:.01em;color:var(--ink);transition:color .2s}
 .brand:hover{color:var(--accent)}
+.brand-logo{height:30px;width:auto;border-radius:6px;border:1px solid var(--line)}
+.about-avatar{width:92px;height:92px;border-radius:50%;object-fit:cover;border:1px solid var(--line);flex:none;background:var(--bg-2)}
 .nav-links{display:flex;align-items:center;gap:24px;font-size:14.5px;color:var(--muted)}
 .nav-links a{transition:color .2s;padding:4px 0}
 .nav-links a:hover{color:var(--ink)}
@@ -208,7 +210,7 @@ footer{border-top:1px solid var(--line);padding:38px 0 42px;background:var(--bg-
 <!-- ================= 顶部导航 ================= -->
 <header class="nav" id="nav">
   <div class="container nav-in">
-    <a class="brand" href="#/home">中登写日报</a>
+    <a class="brand" href="#/home"><img class="brand-logo" src="logo.jpg" alt="中登写日报">中登写日报</a>
     <nav class="nav-links" id="navLinks">
       <a href="#/home" data-nav="home">首页</a>
       <a href="#/about" data-nav="about">关于</a>
@@ -306,15 +308,17 @@ footer{border-top:1px solid var(--line);padding:38px 0 42px;background:var(--bg-
   </div>
   <div class="container narrow about-wrap">
     <div class="about-head">
+      <img class="about-avatar" src="logo.jpg" alt="江博">
       <div>
         <h1>你好，我是江博</h1>
-        <p class="sub">【从业年限】+ 年互联网从业者，现全职做自媒体，主理「中登写日报」</p>
+        <p class="sub">15 年+互联网与电商从业者，现专注 AI 应用与营销运营，主理「中登写日报」</p>
       </div>
     </div>
     <div class="about-sec">
       <h2>关于我</h2>
-      <p>【一段个人经历介绍：做过什么、现在做什么。】这里不讲理论——起号、冷启动、变现、避坑，都是正在跑的事，跑通了就复盘一遍，做错了也照实说。</p>
-      <p>这个博客就是我的复盘本：把踩过的坑、跑通的路，原原本本写下来。每周更新，欢迎常来。</p>
+      <p>我是一名 AI 从业者，也是互联网行业的营销运营操盘手。先后在网易、京东等头部互联网公司工作，累计超过 15 年，长期负责电商业务与营销运营——做过从 0 到 1 的增长项目，也操盘过大规模营销活动。</p>
+      <p>离开大厂后，我做过实体创业：创办过药店，参与过医疗机构的经营。把线上的打法用到线下，也补上了实体经营这一课；电商方面，我持续深耕多年，从平台到内容电商都有完整操盘经验。</p>
+      <p>这几年 AI 快速发展，我把重心转到 AI 应用上，用 AI 重新做内容、做运营、做增长。「中登写日报」就是我的复盘本：不吹概念，只写正在跑的事——AI 怎么落地、内容怎么做、电商怎么操盘、踩过哪些坑。跑通了复盘一遍，做错了也照实说。每周更新，欢迎常来。</p>
     </div>
     <div class="about-sec">
       <h2>从业经历</h2>
@@ -325,7 +329,7 @@ footer{border-top:1px solid var(--line);padding:38px 0 42px;background:var(--bg-
       <div class="contact-card">
         <h3>想合作、咨询，或聊聊内容？</h3>
         <p>发邮件给我，通常在 <b style="color:var(--text)">24 小时内回复</b>。</p>
-        <p class="mail">【你的邮箱】</p>
+        <p class="mail">hello@中登写日报.com（占位，请替换为你的真实邮箱）</p>
       </div>
     </div>
   </div>
@@ -474,9 +478,11 @@ function renderArticle(id){
 /* ================= 视图：关于 ================= */
 function renderAbout(){
   var tl=[
-    {time:'2016 - 2022',t:'一线研发 / 产品',d:'6 年一线代码，5 年互联网产品，做过大型跨境支付系统。'},
-    {time:'2023 - 2025',t:'业余做号，验证路径',d:'周末固定输出，跑通起号、冷启动与内容变现的完整路径。'},
-    {time:'2026 至今',t:'全职自媒体 · 中登写日报',d:'把热爱做成内容，把内容做成生意，持续复盘，持续输出。'}
+    {time:'大厂 15 年+',t:'网易 · 京东 · 电商与营销运营',d:'在头部互联网公司累计工作超过 15 年，长期操盘电商业务与营销运营，负责过从 0 到 1 的增长项目与大规模营销活动。'},
+    {time:'实体创业',t:'药店 · 医疗机构',d:'下场做实体：创办过药店，参与过医疗机构经营，验证线上打法在线下场景的落地。'},
+    {time:'电商深耕',t:'平台电商 · 内容电商',d:'从平台运营到内容电商，多年完整操盘经验，熟悉流量、转化与供应链的配合。'},
+    {time:'AI 转型',t:'AI 应用 · 营销运营',d:'把重心转向 AI：用 AI 重做内容、运营与增长，探索 AI 在商业场景中的实际落地。'},
+    {time:'2026 至今',t:'全职自媒体 · 中登写日报',d:'把实战复盘写成内容：AI 落地、内容方法、电商操盘、创业避坑，持续输出。'}
   ];
   document.getElementById('aboutTimeline').innerHTML=tl.map(function(x){
     return '<div class="tl-item"><span class="tl-time">'+x.time+'</span><span class="tl-line"></span><div class="tl-body"><h4>'+x.t+'</h4><p>'+x.d+'</p></div></div>';

@@ -261,7 +261,7 @@ h1,h2,h3{font-family:var(--font-serif)}
 <div class="import-modal" id="importModal">
   <div class="import-card">
     <h3>一键导入 HTML 文章</h3>
-    <p class="hint">粘贴网页 HTML 代码或上传 .html 文件，自动识别标题、正文段落与第一张图片（作头图），导入后可在下方编辑器中修改。</p>
+    <p class="hint">粘贴网页 HTML 代码或上传 .html 文件，自动识别标题、正文文本与配图（第一张图作头图）。「开始导入」先填进编辑器供检查，「导入并发布」直接保存并立即上线。</p>
     <div class="import-tabs">
       <button class="on" id="tabPaste" data-tab="paste">粘贴 HTML</button>
       <button id="tabFile" data-tab="file">上传文件</button>
@@ -274,6 +274,7 @@ h1,h2,h3{font-family:var(--font-serif)}
     <input type="file" id="importFile" accept=".html,.htm,text/html" style="display:none">
     <div class="admin-actions">
       <button class="btn btn-primary" id="importDo">开始导入</button>
+      <button class="btn btn-primary" id="importDoPub">导入并发布</button>
       <button class="btn btn-ghost" id="importCancel">取消</button>
     </div>
   </div>
@@ -452,7 +453,7 @@ function deletePost(id){
 }
 
 /* ================= 一键导入 HTML ================= */
-function importHTML(html){
+function importHTML(html, autoPublish){
   var doc;
   try{doc=new DOMParser().parseFromString(html,'text/html');}catch(e){toast('HTML 解析失败');return;}
   if(!doc||!doc.body){toast('HTML 解析失败');return;}
@@ -507,6 +508,16 @@ function importHTML(html){
   setCover(cover);
   document.getElementById('fExcerpt').value=excerpt;
   document.getElementById('fContent').value=content;
+  if(autoPublish){
+    var fd=document.getElementById('fDate');
+    if(!fd.value){
+      var d=new Date(),mm=('0'+(d.getMonth()+1)).slice(-2),dd=('0'+d.getDate()).slice(-2);
+      fd.value=d.getFullYear()+'-'+mm+'-'+dd;
+    }
+    saveEditor();
+    toast('已导入并发布：文章已保存，前台即时生效');
+    return;
+  }
   toast('导入成功：原网页文本与配图已保留，可修改后保存发布');
 }
 function showImportTab(mode){
@@ -542,6 +553,13 @@ document.getElementById('importDo').addEventListener('click',function(){
   if(!html||!html.trim()){toast('请先粘贴 HTML 或选择文件');return;}
   importModal.classList.remove('on');
   importHTML(html);
+});
+document.getElementById('importDoPub').addEventListener('click',function(){
+  var mode=importModal._tab||'paste';
+  var html=mode==='file'?(importModal._fileText||''):document.getElementById('importText').value;
+  if(!html||!html.trim()){toast('请先粘贴 HTML 或选择文件');return;}
+  importModal.classList.remove('on');
+  importHTML(html,true);
 });
 document.getElementById('importFile').addEventListener('change',function(e){
   var f=e.target.files&&e.target.files[0];

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>登录注册 · 中登写日报</title>
+<title>登录注册 Sign In · 中登日报 Zhongdeng Daily</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F7F6F3'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%23192930'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://miaoda.feishu.cn">
 <link href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -28,7 +28,8 @@ h1,h2,h3{font-family:var(--font-serif)}
 
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav-in{height:64px;max-width:1120px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand{font-family:var(--font-serif);font-size:19px;font-weight:700;color:var(--ink);transition:color .2s}
+.brand{font-family:var(--font-serif);font-size:19px;font-weight:700;color:var(--ink);transition:color .2s;line-height:1.2}
+.brand .en{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
 .brand:hover{color:var(--accent)}
 .nav-l{display:flex;align-items:center;gap:18px;font-size:13.5px;color:var(--faint)}
 .nav-l a:hover{color:var(--accent)}
@@ -95,7 +96,7 @@ h1,h2,h3{font-family:var(--font-serif)}
 <!-- ================= 顶部导航 ================= -->
 <header class="nav">
   <div class="nav-in">
-    <a class="brand" href="blog.html">中登写日报</a>
+    <a class="brand" href="blog.html"><span>中登日报<em class="en">Zhongdeng Daily</em></span></a>
     <div class="nav-l">
       <a href="blog.html">返回网站</a>
       <a href="admin.html">发布后台</a>
@@ -121,7 +122,7 @@ h1,h2,h3{font-family:var(--font-serif)}
   <!-- 登录 / 注册 -->
   <div class="auth-card" id="authCard">
     <div class="auth-head">
-      <h1>登录 / 注册</h1>
+      <h1>登录 / 注册<span class="h1-en" style="display:block;font-size:12px;font-weight:600;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-top:6px">Sign In / Register</span></h1>
       <p>邮箱注册，数据存入云端数据库</p>
     </div>
     <div class="tabs">
